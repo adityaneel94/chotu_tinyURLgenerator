@@ -1,0 +1,2 @@
+# Chotu
+Tiny URL generator
