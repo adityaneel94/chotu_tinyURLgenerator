@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Tiny URL-Sign Up</title>
+
+
+  <link rel='stylesheet prefetch' href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css'>
+
+<style>
+
+
+/* The version of Bourbon used in this Pen was 4.* */
+@import "bourbon";
+
+body{background: #eee url(http://subtlepatterns.com/patterns/sativa.png);}
+html,body{
+    position: relative;
+    height: 100%;
+}
+.wrapper {
+	margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+.form-signin {
+  max-width: 380px;
+  padding: 15px 35px 45px;
+  margin: 0 auto;
+  background-color: #ffefd5;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+
+  .form-signin-heading,
+	.checkbox {
+	  margin-bottom: 30px;
+	}
+
+	.checkbox {
+	  font-weight: normal;
+	}
+
+	.form-control {
+	  position: relative;
+	  font-size: 16px;
+	  height: auto;
+	  padding: 10px;
+		@include box-sizing(border-box);
+
+		&:focus {
+		  z-index: 2;
+		}
+	}
+
+	input[type="text"] {
+	  margin-bottom: -1px;
+	  border-bottom-left-radius: 0;
+	  border-bottom-right-radius: 0;
+	}
+
+	input[type="password"] {
+	  margin-bottom: 20px;
+	  border-top-left-radius: 0;
+	  border-top-right-radius: 0;
+	}
+}
+</style>
+
+</head>
+
+<body>
+    <div class="wrapper">
+    <div class="form-signin">
+      <h2 class="form-signin-heading">Sign Up</h2>
+      <input id="username" type="text" class="form-control" name="username" placeholder="Username" required="" autofocus="" />
+<br>
+      <input id="email" type="text" class="form-control" name="email" placeholder="Email Address" required=""/>
+<br>
+      <input id="password" type="password" class="form-control" name="password" placeholder="Password" required="" autofocus="" />
+<br>
+      <button id="signup_button" class="btn btn-lg btn-primary btn-block" type="button">Sign Up</button>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!--  ################### sending data to mongodb via controller ##################-->
+
+  <script type="text/javascript">
+
+  $(document).ready(function(){
+
+  $("#signup_button").click(function(){
+
+  var uname= $("#username").val();//using jquery
+  var em= $("#email").val();//using jquery
+  var pas= $("#password").val();//using jquery
+
+
+
+  //---input fields validation
+  if(uname == "")
+  {
+    alert("Please enter a username !");
+  }
+  else if (em == "")
+  {
+    alert("Please enter your e-mail address !");
+  }
+  else if(pas == "")
+  {
+    alert("Please enter a password !");
+  }
+//---fields validation done
+  if(uname != "" && em!="" && pas !="")
+  {
+
+      var obj={
+        "username":uname,
+        "email":em,
+        "password":pas
+      }
+
+    $.ajax({//ajax request to send text field data that is converted to json object to controller and from there to mongodb
+    type: 'POST',
+    url: '/signup_database',
+    data: obj,
+    success: function(data){
+//          window.location.pathname="/dashboard"
+    }
+  });
+
+  //  alert(uname);
+      $.ajax({//ajax request to send text field data that is converted to json object to controller and from there to mongodb
+      type: 'GET',
+      url: '/login',
+      success: function(data){
+            window.location.pathname="/login"
+      }
+  //    return false; if we uncomment it then this ajax will be unsuccessful
+      });
+//      return false;//always after the ajax call ???
+
+  }
+
+
+  });//signup_button fn. ends
+  });//document.ready fn. ends
+  </script>
+
+<!--###############################################################################-->
+
+
+
+</body>
+</html>

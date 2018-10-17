@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Tiny URL-Shortener</title>
+
+
+  <link rel='stylesheet prefetch' href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Optional Bootstrap theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <style>
+
+
+
+  body{background: #eee url(http://subtlepatterns.com/patterns/sativa.png);}
+  html,body{
+      position: relative;
+      height: 100%;
+  }
+  .wrapper {
+  	margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  .container2 {
+    width: 1200px;
+    position: relative;
+    margin:0 auto;
+    line-height: 1.4em;
+    padding: 15px 35px 45px;
+    background-color: #ffefd5;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    margin-left:30%;
+/*    width:100%*/
+  }
+
+/* If in mobile screen with maximum width 479px. The iPhone screen resolution is 320x480 px (except iPhone4, 640x960)
+    @media only screen and (max-width: 479px){
+      #container2 { width: 90%; }
+  }
+*/
+  .form-signin {
+    max-width: 380px;
+    padding: 15px 35px 45px;
+    margin: 0 auto;
+    background-color: #ffefd5;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 10px;
+
+    .form-signin-heading,
+  	.checkbox {
+  	  margin-bottom: 30px;
+  	}
+
+  	.checkbox {
+  	  font-weight: normal;
+  	}
+
+  	.form-control {
+  	  position: relative;
+  	  font-size: 16px;
+  	  height: auto;
+  	  padding: 10px;
+  		@include box-sizing(border-box);
+
+  		&:focus {
+  		  z-index: 2;
+  		}
+  	}
+
+  	input[type="text"] {
+  	  margin-bottom: -1px;
+  	  border-bottom-left-radius: 0;
+  	  border-bottom-right-radius: 0;
+  	}
+
+  	input[type="password"] {
+  	  margin-bottom: 20px;
+  	  border-top-left-radius: 0;
+  	  border-top-right-radius: 0;
+  	}
+  }
+
+
+
+
+  .chart-legend li span{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+  </style>
+
+</head>
+
+<body>
+
+
+
+
+
+  <div id="myModalSearch" class="modal fade">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                   <h4 class="modal-title">Success!!</h4>
+               </div>
+               <div class="modal-body">
+
+                 <div class="box-body no-padding">
+  <canvas id="canvas" height="450" width="610"></canvas>
+</div>
+
+
+
+
+
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="container">
+
+    <div class="col-lg-4" style="margin-top: 3%;margin-left: -13%;margin-right: 0%;">
+
+    <div class="form-signin">
+      <h2 class="form-signin-heading">URL-Shortener</h2>
+      <input id="long_url" type="text" class="form-control" name="long_url" placeholder="Enter Long URL" required="" autofocus="" />
+      <div>
+      <hr>Custom alias (optional):<br>
+      <tt class="basecontent"><b>http://chotu.com/</b>
+      <input id="alias" type="text" class="form-control" name="alias" maxlength="30" placeholder="Enter alias..." required="" autofocus="" />
+      </tt>
+      <br><small><i>May contain letters, numbers, and dashes.</i></small>
+    </div>
+
+    <br>
+      <button id="shorten_url_btn" class="btn btn-lg btn-primary btn-block" type="button">Shorten URL</button>
+    <br>
+      <button id="old_links_btn" class="btn btn-lg btn-primary btn-block" type="button">Old Links</button>
+    <br>
+      <button id="logout_button" class="btn btn-lg btn-primary btn-block" type="button">Logout</button>
+
+      <br>
+        <button id="show_graph" class="btn btn-lg btn-primary btn-block" type="button">Show Chart</button>
+    </div>
+
+
+
+  </div>
+
+<div id="chotusrf" class="col-lg-8" style="margin-top: -44.1%;margin-left: 10%;margin-right: 5%;">
+
+<div id="current_shortened_url" class="container2" style="display:none">
+<p id="chotus"></p>
+</div>
+
+<div id="old_urls_table" class="container2" style="background-color: powderblue; display:none; ">
+
+  <span><b>Old Links:</b><br></span>
+  <br>
+
+  <table id="dynamic_table" class="table">
+
+          <!-- <thead>
+            <tr>
+              <th>Long URL</th>
+              <th>Shortened URL</th>
+              <th>No. of clicks</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          </tbody> -->
+  </table>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
+  <!-- <script src="https://raw.githubusercontent.com/nnnick/Chart.js/master/Chart.min.js" ></script> -->
+<script>
+
+// <!-- <div class="updatesettings" id="one">One</a>
+// <div class="updatesettings" id="two">Two</a> -->
+// -->
+// <script>
+    $(document).on('click', '.updatesettings', function( event ) {
+       //Do Code here
+       //For all .updatesettings click event
+       clicked_link_id = $(this).attr('id');
+       var long_url_name = document.getElementById(clicked_link_id).href;
+       long_url_name = long_url_name.slice(0,-1);
+
+      obj={
+        "long_url": long_url_name,
+        "click_count":1
+      }
+
+//       alert("incrementing count of URL: "+long_url_name);
+       $.ajax({
+         type: 'POST',
+         url: '/increment_click_count',
+         data: obj,
+         success: function(data){
+            //incrementing the value of count
+         }
+       });
+    });
+</script>
+  <script type="text/javascript">
+
+  $(document).ready(function(){
+
+$("#shorten_url_btn").click(function(){
+
+  var str= $("#long_url").val();//using jquery
+
+/////////////////// checking for empty long url?? //////////
+  if(str == "")
+    alert("Enter the long url !!!");
+////////////////////// only if user has entered some long url///////////////
+  else
+  {
+//------------ handling "http://" prefix
+    if(str.substring(0,7)=="http://")
+    {
+//      str="http://"+str;
+    }
+//------------ handling "https://" prefix
+    else if(str.substring(0,8)=="https://")
+    {
+//      str="https://"+str;
+    }
+    else {
+      str = "http://"+str;
+    }
+
+    var al=$("#alias").val();
+
+///////////////// if alias is empty apply fnv algorithm ///////////////////
+    if(al == "")
+    {
+      //################## url shortening algo ##################
+      //var str= document.getElementById('long_url').value;//using javascript
+    	var FNV1_32A_INIT = 0x811c9dc5;
+    	var hval = FNV1_32A_INIT;
+    	for ( var i = 0; i < str.length; ++i )
+    	{
+    		hval ^= str.charCodeAt(i);
+    		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+    	}
+      hval>>>0;
+      if(hval<0)
+        hval=(-1)*hval;
+    //	return hval >>> 0;
+    //}
+
+    //##########################################################
+    hval.toString();
+    }
+//////////////////// else use alias as it is(but check for its entry in database) ///////////////////
+    else {
+      hval=al;
+    }
+  s="http://chotu.com/"+hval;
+// if(str.substring(0,7)!="http://")
+//   str="http://"+str;
+
+  $("#chotus").html("<b>Your Shortened URL:</b><br>&nbsp;<a href="+str+">"+s+"</a>");
+  $("#current_shortened_url").show();
+
+//  alert(s);
+
+
+
+  //-------------------------------------------------------
+
+
+  var td = localStorage.getItem("today");
+//  alert(td);
+  var owner = localStorage.getItem("email");
+//  var cc = 0;//take count from href script
+    var obj={
+    "email":owner,
+    "long_url":str,
+    "shortened_url":s,
+    "click_count":0,//initial value of count during shortening
+    "date":td,
+    "date_number":localStorage.getItem("date_number")
+  }
+
+//alert(localStorage.getItem("date_number"));
+
+    $.ajax({//ajax request to send text field data that is converted to json object to controller and from there to mongodb
+    type: 'POST',
+    url: '/dashboard_database',
+    data: obj,
+    success: function(data){
+//          window.location.pathname="/dashboard"
+    }
+  });
+
+  //return false;
+  //-------------------------------------------------------------
+
+
+
+//  ---- getting click_count for email+long_url combination to make charts -----
+
+
+  obj={
+      "long_url":str,
+      "email":localStorage.getItem("email"),
+      "date":localStorage.getItem("today"),
+      "date_number":localStorage.getItem("date_number")
+  }
+  $.ajax({
+    type:'POST',
+    url:'/get_click_count',
+    data:obj,
+    success: function(data){
+    //alert("inside ajax for count ...");
+    //alert(data.click_count);
+
+    }
+  });
+
+  //----------------------------------------------------------------------------
+
+
+
+  //--------- db acc to long_url (day,click_count)---------
+
+  var ha = localStorage.getItem("email")+str;
+  var today = new Date();
+  localStorage.setItem("today",today);
+//  localStorage.setItem("current_day",today);
+//  alert(today.getMonth());
+  var d = today.getDate();
+  var m = today.getMonth()+1;
+  var y = today.getFullYear();
+  localStorage.setItem("date_number",d);
+  //alert(d+"-"+m+"-"+y)
+  vv=d+"-"+m+"-"+y;
+  localStorage.setItem("whole_date",vv);
+//  alert(today)
+
+
+
+
+
+  var current_date = today.getDate();
+  obj_chart = {
+  "hash": ha,
+  "date": today,
+  "click_count":5,
+  "date_number":localStorage.getItem("date_number")
+  }
+
+  //--- //ajax request to send text field data that is converted to json object to controller and from there to mongodb ---
+
+  $.ajax({
+  type: 'POST',
+  url: '/chart_database',
+  data: obj_chart,
+  success: function(data){
+  //          window.location.pathname="/dashboard"
+  alert("chart values going to be inserted !!!");
+
+  }
+  });
+  //---------------------------------------------------------------------------
+return false;
+
+}
+
+});//shorten button click ends here
+
+
+ $("#old_links_btn").click(function(){
+
+  var owner = localStorage.getItem("email");
+  var obj={
+    "email":owner
+  };
+
+   $.ajax({
+     type: 'POST',
+     url: '/dashboard_old_link',
+     data: obj,
+     success: function(data){
+       //do something with the data via front-end framework
+
+       alert(owner);
+
+       $("#dynamic_table").html("<b>Your Shortened URL:</b><br>");
+         var statArr = data;
+         var tData = "";
+
+         tData = tData+"<tr><th>S.No.</th><th>Long URL</th><th>Shortened URL</th><th>Created on (DD-MM-YYYY)</th><th>No. of Clicks</th><th>Invalidate URL</th><th>See Graphs</th></tr>"
+
+          for(var i = 0 ;i<data.length;i++){
+
+               var old_link = statArr[i].long_url;
+               var shortened = statArr[i].shortened_url;
+               var clicks = statArr[i].click_count;
+//               alert("count = "+clicks);
+                //bunty_1
+                //bunty_long_1
+                //bunty_short_1
+
+               tData = tData+"<tr><td>"+(i+1)+"</td><td><a id="+"bunty_long_"+(i+1)+" href="+old_link+"/>"+old_link+"</td><td><a class=\"updatesettings\" id="+"bunty_short"+(i+1)+" href="+old_link+"/>"+shortened+"</td><td>"+localStorage.getItem("whole_date")+"</td><td>"+clicks+"</td><td><button type=\"button\" id="+"bunty_"+(i+1)+" class=\"btn btn-success\" onClick=\"reply_click("+(i+1)+")\">Invalidate</button></td></tr>"
+                                                                                                                                                          // use this class for styling of button: class=\"btn btn-lg btn-primary btn-block\" type=\"button\"
+           }
+           document.getElementById("dynamic_table").innerHTML = tData;
+   //    return false;
+
+
+       $("#old_urls_table").show();
+
+
+       console.log("saved ");
+     }
+   });
+   return false;
+
+ });
+
+ $("#logout_button").click(function(){
+
+     $.ajax({
+
+       type: 'GET',
+       url: '/login',
+       success: function(data){
+           window.location.pathname="/login"
+       }
+
+     });
+   //return false;
+  });
+
+
+
+
+
+  $("#show_graph").click(function(){
+
+
+    var obj={};
+
+      $.ajax({
+
+        type: 'POST',
+        url: '/show_graph',
+        data:obj,
+        success: function(data){
+
+
+
+
+          $("#myModalSearch").modal('show');
+
+
+          // var PieChart = [
+          //     {
+          //         value: 40,
+          //         color:"#fcc79e",
+          //         label: "Label 1"
+          //     },
+          //     {
+          //         value : 30,
+          //         color : "#beefd2",
+          //         label: "Label 1"
+          //     },
+          //     {
+          //         value : 90,
+          //         color : "#ffddfb",
+          //         label: "Label 1"
+          //     }
+          //
+          // ];
+
+
+        var PieChart=[];
+        var obj={};
+
+
+        var color=["#fcc79e","#beefd2","#ffddfb"];
+
+        for(var i=0;i<data.length;i++)
+        {
+
+        var c=i%3;
+        var count ="count :"+data[i].click_count;
+         var date ="date :"+data[i].date_number;
+
+         var label=count+" "+date;
+        obj={
+          value:data[i].click_count,
+          label:label,
+          color:color[c],
+
+        }
+          PieChart.push(obj);
+
+        }
+
+
+
+
+
+
+
+  var myPieChart = new Chart(document.getElementById("canvas").getContext("2d")).Doughnut(PieChart);
+
+
+
+
+        }
+
+      });
+    //return false;
+   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+  });
+
+
+
+
+
+
+
+
+  </script>
+
+<script type="text/javascript">
+function reply_click(clicked_id)
+{
+
+  //  alert(clicked_id);
+    var ll = "bunty_long_"+clicked_id;
+    var new_ll = document.getElementById(ll).href;
+    var btn_id="#bunty_"+clicked_id;
+
+obj={};
+
+$.ajax({
+  type:'GET',
+  url: '/dashboard',
+  data: obj,
+  success: function(data){
+    $(btn_id).removeClass("btn btn-success").addClass("btn btn-danger");
+    $(btn_id).attr('disabled','disabled');
+
+  }
+//  return false;
+
+});
+    // $(btn_id).removeClass("btn btn-success").addClass("btn btn-danger");
+    // $(btn_id).attr('disabled','disabled');
+    new_ll = new_ll.slice(0,-1);
+//    alert(new_ll);
+
+    obj={
+      long_url: new_ll
+    }
+    $.ajax({
+      type: 'POST',
+      url: '/dashboard_invalidate',
+      data:obj,
+      success: function(data){
+        //  window.location.pathname="/login"
+//        alert(ll);
+        alert("URL Invalidated !!!")
+
+      }
+
+    });
+    return false;
+
+}
+</script>
+
+
+</body>
+</html>
